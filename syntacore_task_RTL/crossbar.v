@@ -1,28 +1,28 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
 /*
-req - однобитный сигнал, запрос на выполнение транзакции
+req - Г®Г¤Г­Г®ГЎГЁГІГ­Г»Г© Г±ГЁГЈГ­Г Г«, Г§Г ГЇГ°Г®Г± Г­Г  ГўГ»ГЇГ®Г«Г­ГҐГ­ГЁГҐ ГІГ°Г Г­Г§Г ГЄГ¶ГЁГЁ
 (master-> slave)
 
-addr - 32-битный шина, содержит адрес запроса (master-
+addr - 32-ГЎГЁГІГ­Г»Г© ГёГЁГ­Г , Г±Г®Г¤ГҐГ°Г¦ГЁГІ Г Г¤Г°ГҐГ± Г§Г ГЇГ°Г®Г±Г  (master-
 >slave)
-cmd - однобитный сигнал - признак операции: 0 - read, 1 -
+cmd - Г®Г¤Г­Г®ГЎГЁГІГ­Г»Г© Г±ГЁГЈГ­Г Г« - ГЇГ°ГЁГ§Г­Г ГЄ Г®ГЇГҐГ°Г Г¶ГЁГЁ: 0 - read, 1 -
 write (master->slave)
 
-wdata - 32-битный шина, содержит записываемые данные.
-передаются в том же такте , что и адрес (master-> slave)
-ack - однобитный сигнал-подтверждение, что в данном такте
-slave принял запрос к исполнению (slave->master). при этом, slave должен
-зафиксировать _addr, _cmd, и _wdata (в случае транзакции записи). перевод
-_ack в активное состояние разрешает master устройству снять запрос в
-следующем такте
+wdata - 32-ГЎГЁГІГ­Г»Г© ГёГЁГ­Г , Г±Г®Г¤ГҐГ°Г¦ГЁГІ Г§Г ГЇГЁГ±Г»ГўГ ГҐГ¬Г»ГҐ Г¤Г Г­Г­Г»ГҐ.
+ГЇГҐГ°ГҐГ¤Г ГѕГІГ±Гї Гў ГІГ®Г¬ Г¦ГҐ ГІГ ГЄГІГҐ , Г·ГІГ® ГЁ Г Г¤Г°ГҐГ± (master-> slave)
+ack - Г®Г¤Г­Г®ГЎГЁГІГ­Г»Г© Г±ГЁГЈГ­Г Г«-ГЇГ®Г¤ГІГўГҐГ°Г¦Г¤ГҐГ­ГЁГҐ, Г·ГІГ® Гў Г¤Г Г­Г­Г®Г¬ ГІГ ГЄГІГҐ
+slave ГЇГ°ГЁГ­ГїГ« Г§Г ГЇГ°Г®Г± ГЄ ГЁГ±ГЇГ®Г«Г­ГҐГ­ГЁГѕ (slave->master). ГЇГ°ГЁ ГЅГІГ®Г¬, slave Г¤Г®Г«Г¦ГҐГ­
+Г§Г ГґГЁГЄГ±ГЁГ°Г®ГўГ ГІГј _addr, _cmd, ГЁ _wdata (Гў Г±Г«ГіГ·Г ГҐ ГІГ°Г Г­Г§Г ГЄГ¶ГЁГЁ Г§Г ГЇГЁГ±ГЁ). ГЇГҐГ°ГҐГўГ®Г¤
+_ack Гў Г ГЄГІГЁГўГ­Г®ГҐ Г±Г®Г±ГІГ®ГїГ­ГЁГҐ Г°Г Г§Г°ГҐГёГ ГҐГІ master ГіГ±ГІГ°Г®Г©Г±ГІГўГі Г±Г­ГїГІГј Г§Г ГЇГ°Г®Г± Гў
+Г±Г«ГҐГ¤ГіГѕГ№ГҐГ¬ ГІГ ГЄГІГҐ
 
-rdata - 32-битная шина, содержит считываемые данные.
-передаются на следующем такте после подтверждения транзакции(_ack = 1)(slave-
+rdata - 32-ГЎГЁГІГ­Г Гї ГёГЁГ­Г , Г±Г®Г¤ГҐГ°Г¦ГЁГІ Г±Г·ГЁГІГ»ГўГ ГҐГ¬Г»ГҐ Г¤Г Г­Г­Г»ГҐ.
+ГЇГҐГ°ГҐГ¤Г ГѕГІГ±Гї Г­Г  Г±Г«ГҐГ¤ГіГѕГ№ГҐГ¬ ГІГ ГЄГІГҐ ГЇГ®Г±Г«ГҐ ГЇГ®Г¤ГІГўГҐГ°Г¦Г¤ГҐГ­ГЁГї ГІГ°Г Г­Г§Г ГЄГ¶ГЁГЁ(_ack = 1)(slave-
 > master)
 ------------------------
-Выбор slave устройства определяется старшим битом адреса. Арбитраж между
-несколькими master запросами в одно slave устройство осуществляется по дисциплине
+Г‚Г»ГЎГ®Г° slave ГіГ±ГІГ°Г®Г©Г±ГІГўГ  Г®ГЇГ°ГҐГ¤ГҐГ«ГїГҐГІГ±Гї Г±ГІГ Г°ГёГЁГ¬ ГЎГЁГІГ®Г¬ Г Г¤Г°ГҐГ±Г . ГЂГ°ГЎГЁГІГ°Г Г¦ Г¬ГҐГ¦Г¤Гі
+Г­ГҐГ±ГЄГ®Г«ГјГЄГЁГ¬ГЁ master Г§Г ГЇГ°Г®Г±Г Г¬ГЁ Гў Г®Г¤Г­Г® slave ГіГ±ГІГ°Г®Г©Г±ГІГўГ® Г®Г±ГіГ№ГҐГ±ГІГўГ«ГїГҐГІГ±Гї ГЇГ® Г¤ГЁГ±Г¶ГЁГЇГ«ГЁГ­ГҐ
 "round-robin".
 */
 //////////////////////////////////////////////////////////////////////////////////
@@ -31,33 +31,33 @@ module crossbar(
 	input		clk,
 	
 	// masters
-	input			master_0_req,	 input			master_1_req,				             
+	input		master_0_req,	 input		master_1_req,				             
 	input	[31:0]	master_0_addr,   input	[31:0]	master_1_addr,      	    
-	input			master_0_cmd,    input			master_1_cmd,       	         
+	input		master_0_cmd,    input		master_1_cmd,       	         
 	input 	[31:0]	master_0_wdata,  input 	[31:0]	master_1_wdata,     	  
-	output 			master_0_ack,    output 		master_1_ack,       	        
+	output 		master_0_ack,    output 	master_1_ack,       	        
 	output	[31:0]	master_0_rdata,  output	[31:0]	master_1_rdata,  
 	
-	input			master_2_req,	 input			master_3_req,				             
+	input		master_2_req,	 input		master_3_req,				             
 	input	[31:0]	master_2_addr,   input	[31:0]	master_3_addr,      	    
-	input			master_2_cmd,    input			master_3_cmd,       	         
+	input		master_2_cmd,    input		master_3_cmd,       	         
 	input 	[31:0]	master_2_wdata,  input 	[31:0]	master_3_wdata,     	  
-	output 			master_2_ack,    output 		master_3_ack,       	        
+	output 		master_2_ack,    output 	master_3_ack,       	        
 	output	[31:0]	master_2_rdata,  output	[31:0]	master_3_rdata,   	   
 	
 	// slaves
-	output			slave_0_req,	 output			slave_1_req,					        
+	output		slave_0_req,	 output		slave_1_req,					        
 	output	[31:0]	slave_0_addr,    output	[31:0]	slave_1_addr,       	    
-	output			slave_0_cmd,     output			slave_1_cmd,        	         
+	output		slave_0_cmd,     output		slave_1_cmd,        	         
 	output 	[31:0]	slave_0_wdata,   output	[31:0]	slave_1_wdata,      	   
-	input 			slave_0_ack,     input 			slave_1_ack,        	        
+	input 		slave_0_ack,     input 		slave_1_ack,        	        
 	input	[31:0]	slave_0_rdata,   input	[31:0]	slave_1_rdata, 
 	
-	output			slave_2_req,	 output			slave_3_req,					        
+	output		slave_2_req,	 output		slave_3_req,					        
 	output	[31:0]	slave_2_addr,    output	[31:0]	slave_3_addr,       	    
-	output			slave_2_cmd,     output			slave_3_cmd,        	         
+	output		slave_2_cmd,     output		slave_3_cmd,        	         
 	output 	[31:0]	slave_2_wdata,   output	[31:0]	slave_3_wdata,      	   
-	input 			slave_2_ack,     input 			slave_3_ack,        	        
+	input 		slave_2_ack,     input 		slave_3_ack,        	        
 	input	[31:0]	slave_2_rdata,   input	[31:0]	slave_3_rdata      	  
 	                                
     );
