@@ -37,89 +37,100 @@ module crossbar(
 	input 	[31:0]	master_0_wdata,  input 	[31:0]	master_1_wdata,     	  
 	output 			master_0_ack,    output 		master_1_ack,       	        
 	output	[31:0]	master_0_rdata,  output	[31:0]	master_1_rdata,  
-	
-	input			master_2_req,	 input			master_3_req,				             
-	input	[31:0]	master_2_addr,   input	[31:0]	master_3_addr,      	    
-	input			master_2_cmd,    input			master_3_cmd,       	         
-	input 	[31:0]	master_2_wdata,  input 	[31:0]	master_3_wdata,     	  
-	output 			master_2_ack,    output 		master_3_ack,       	        
-	output	[31:0]	master_2_rdata,  output	[31:0]	master_3_rdata,   	   
-	
+	  	   
 	// slaves
 	output			slave_0_req,	 output			slave_1_req,					        
 	output	[31:0]	slave_0_addr,    output	[31:0]	slave_1_addr,       	    
 	output			slave_0_cmd,     output			slave_1_cmd,        	         
 	output 	[31:0]	slave_0_wdata,   output	[31:0]	slave_1_wdata,      	   
 	input 			slave_0_ack,     input 			slave_1_ack,        	        
-	input	[31:0]	slave_0_rdata,   input	[31:0]	slave_1_rdata, 
-	
-	output			slave_2_req,	 output			slave_3_req,					        
-	output	[31:0]	slave_2_addr,    output	[31:0]	slave_3_addr,       	    
-	output			slave_2_cmd,     output			slave_3_cmd,        	         
-	output 	[31:0]	slave_2_wdata,   output	[31:0]	slave_3_wdata,      	   
-	input 			slave_2_ack,     input 			slave_3_ack,        	        
-	input	[31:0]	slave_2_rdata,   input	[31:0]	slave_3_rdata      	  
+	input	[31:0]	slave_0_rdata,   input	[31:0]	slave_1_rdata 
 	                                
     );
     
-    reg [1:0] mfor_s0;	reg rest0; // if rest0 = 1 then there's no req for S0
-    reg [1:0] mfor_s1;	reg rest1;
-    reg [1:0] mfor_s2;	reg rest2;
-    reg [1:0] mfor_s3;	reg rest3;
-    
+    reg	mem0; reg e0; // master left for the next clock
+    reg	mem1; reg e1; // emp = 1 if mem is empty 
+	
+	reg mfor0; reg mfor1;
+	
+	reg m0_s0; reg m0_s1;
+	reg m1_s0; reg m1_s1;
+	
+	
     always @(posedge clk)
     begin
     
+    if (~e0)
+    	/* do request mem0 */
+    if (~e1)
+    	/* do request mem1 */
     
-    //round robin ?
-    // S0
-    if (master_0_req != 1'b1 || master_0_addr[31:30] != 2'b00)
-    	if (master_1_req != 1'b1 || master_1_addr[31:30] != 2'b00)
-    		if (master_2_req != 1'b1 || master_2_addr[31:30] != 2'b00)
-    			if (master_3_req == 1'b1 && master_3_addr[31:30] == 2'b00)
-    				/* do reqest from M0 */
-    				mfor_s0 = 2'b 11;
-    			else rest0 = 1'b 1;
-    		else mfor_s0 = 2'b 10;
-    	else mfor_s0 = 2'b 01;
-    else mfor_s0 = 2'b 00;
-    	
-    // S1 VARIANT 2
-    if (master_0_req != 1'b1 || master_0_addr[31:30] != 2'b01)
-    	if (master_1_req != 1'b1 || master_1_addr[31:30] != 2'b01)
-    		if (master_2_req != 1'b1 || master_2_addr[31:30] != 2'b01)
-    			if (master_3_req == 1'b1 && master_3_addr[31:30] == 2'b01)
-    				/* do reqest from M0 */
-    				mfor_s1 = 2'b 11;
-    			else rest1 = 1'b 1;
-    		else mfor_s1 = 2'b 10;
-    	else mfor_s1 = 2'b 01;
-    else mfor_s1 = 2'b 00;
+    m0_s0 = master_0_req & (~master_0_addr[31]);
+    m0_s1 = master_0_req & (master_0_addr[31]);
     
-    // S2
-    if (master_0_req != 1'b1 || master_0_addr[31:30] != 2'b10)
-    	if (master_1_req != 1'b1 || master_1_addr[31:30] != 2'b10)
-    		if (master_2_req != 1'b1 || master_2_addr[31:30] != 2'b10)
-    			if (master_3_req == 1'b1 && master_3_addr[31:30] == 2'b10)
-    				/* do reqest from M0 */
-    				mfor_s2 = 2'b 11;
-    			else rest2 = 1'b 1;
-    		else mfor_s2 = 2'b 10;
-    	else mfor_s2 = 2'b 01;
-    else mfor_s2 = 2'b 00;
-    	
-    // S3
-    if (master_0_req != 1'b1 || master_0_addr[31:30] != 2'b11)
-    	if (master_1_req != 1'b1 || master_1_addr[31:30] != 2'b11)
-    		if (master_2_req != 1'b1 || master_2_addr[31:30] != 2'b11)
-    			if (master_3_req == 1'b1 && master_3_addr[31:30] == 2'b11)
-    				/* do reqest from M0 */
-    				mfor_s2 = 2'b 11;
-    			else rest2 = 1'b 1;
-    		else mfor_s2 = 2'b 10;
-    	else mfor_s2 = 2'b 01;
-    else mfor_s2 = 2'b 00;
-    	
+    m1_s0 = master_1_req & (~master_1_addr[31]);
+    m1_s1 = master_1_req & (master_0_addr[31]);
+    
+    e0 = m0_s0 ;
+    /* do mem0 request if emp0 = 0; mem1 request if emp1 = 0 */
+    
+    
+    /* who goes to mem and who sends request */
+    //check S0
+    if (m1_s0)
+    	if (~m0_s0) 
+    		mfor0 = 1'b 1;
+    	else 
+    		begin
+    		mfor0 = 1'b 0;
+    		mem0 = 1'b 1; 
+    		e0 = 0;
+    		end
+    else
+    	if (m0_s0) 
+    		mfor0 = 1'b 1;
+    	else
+    		//check S1
+    		if (m1_s1)
+    			if (~m0_s1) 
+    				mfor1 = 1'b 1;
+    			else 
+    				begin
+    				mfor1 = 1'b 0;
+    				mem1 = 1'b 1; 
+    				e1 = 0;
+    				end
+    		
+    //check S1
+    if (m1_s1)
+    	if (~m0_s1) 
+    		mfor1 = 1'b 1;
+    	else 
+    		begin
+    		mfor1 = 1'b 0;
+    		mem1 = 1'b 1; 
+    		e1 = 0;
+    		end
+    else
+    	if (m0_s1) 
+    		mfor1 = 1'b 1;
+    	else
+    		//check S0
+    		if (m1_s1)
+    			if (~m1_s1) 
+    				mfor1 = 1'b 1;
+    			else 
+    				begin
+    				mfor1 = 1'b 0;
+    				mem1 = 1'b 1; 
+    				e1 = 0;
+    				end
+    
+    
+    /* do request mfor0 */;
+    
+    /* do request mfor1 */;
+    
     end
                                   
 endmodule
