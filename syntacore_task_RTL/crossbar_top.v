@@ -67,7 +67,7 @@ wire [31:0] rdata_s0_m0, rdata_s0_m1, rdata_s1_m0, rdata_s1_m1;
 wire data_read0_s0, data_read0_s1, data_read1_s0, data_read1_s1;
 
 /* sends data from each slave */
-rdata_seeker sdata0 (
+data_seeker sdata0 (
 	.clk(clk),
 	.slave0(sfor0), .slave1(sfor1),
 	.stat0(req_stat0), .stat1(req_stat1),
