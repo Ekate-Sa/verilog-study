@@ -15,7 +15,7 @@ localparam NO_REQ	= 2'd 0 ; // no request (all completed / not requested)
 
 reg last_mas;
 
-always @(posedge ack_in)
+always @(posedge ack_in or negedge ack_in)
 begin
 	case (last_mas)
 	0: if (sfor1 == s_no && req_stat1 == W_ACK) 

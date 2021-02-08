@@ -18,13 +18,13 @@ localparam NO_REQ	= 2'd 0 ; // no request (all completed / not requested)
 */
 
 
-module rdata_seeker_tb();
+module data_seeker_tb();
 
 reg clk;
 reg sfor0, sfor1;
 
 wire [31:0] rdata0, rdata1;
-
+wire dr0, dr1; // data read signals
 reg [1:0] stat0, stat1;
 
 
@@ -42,7 +42,9 @@ rdata_seeker uut (
 .stat1(stat1), .stat0(stat0),
 .rdata1(rdata1), .rdata0(rdata0),
 .rdata_in(data_come),
-.s_no(s_no)
+.s_no(s_no),
+
+.data_read0(dr0), .data_read1(dr1)
 );
 
 initial begin
@@ -53,7 +55,7 @@ initial begin
 	
 	data_come = {28'b0,4'b1111};
 	#2; clk = 1; #2;
-	$display("to 0: %b",rdata0, "; to 1: %b",rdata1);
+	$display("to 0: %b | dr0=%b ;;",rdata0, dr0, "; to 1: %b | dr1=%b ;;",rdata1,dr1);
 	
 	#5;
 	clk = 0;
@@ -61,13 +63,13 @@ initial begin
 	sfor1 = 1; stat1 = NO_REQ;
 	
 	 #2; clk = 1; #2;
-	$display("to 0: %b",rdata0, "; to 1: %b",rdata1);
+	$display("to 0: %b | dr0=%b ;;",rdata0, dr0, "; to 1: %b | dr1=%b ;;",rdata1,dr1);
 	#5; clk = 0; 
 	
 	sfor0 = 0; stat0 = W_DATA;
 	sfor1 = 1; stat1 = W_DATA;
 	#2; clk = 1; #2;
-	$display("to 0: %b",rdata0, "; to 1: %b",rdata1);
+	$display("to 0: %b | dr0=%b ;;",rdata0, dr0, "; to 1: %b | dr1=%b ;;",rdata1,dr1);
 end
 
 endmodule

@@ -18,7 +18,7 @@ m_block uut
 	.req(m_req), 
 	.slave_in(slave_in), 
 	.c(cmd), // cmd            
- 	.ack_to_m(ack_m), // sen
+ 	
                      
     .req_sent(req_sent), .data_read(data_read),           
 	.ack_in(ack_s), // gets ack f

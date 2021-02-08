@@ -1,16 +1,4 @@
 `timescale 1ps / 1ps
-/*
-produces:
-- ask to add request to the MtoS_que ;
-
-gets:
-- 
-*/
-
-/* keeps a request info: slave number, cmd, request status */
-// master's request status    
-
-
 
 module m_block  // number of M/S
 (
@@ -18,7 +6,7 @@ module m_block  // number of M/S
 	input req, // connected to req
 	input slave_in, // connected to addr 1st bit
 	input c, // cmd
-	output reg ack_to_m, // sends ack to master
+	//output reg ack_to_m, // sends ack to master
 	
 	// to other 
 	input ack_in, // gets ack from slave
@@ -56,7 +44,7 @@ begin
 	1'b1 : req_stat = NO_REQ ; // data written, request done
 	default: req_stat = NO_REQ ;
 	endcase
-	ack_to_m = 1 ;
+	//ack_to_m = 1 ;
 end
 
 always @(posedge req_sent)
@@ -70,25 +58,4 @@ begin
 end
 
 endmodule
-
-/*
-// mb not needed
-module ack_seeker (
-	input [1:0] slave,
-	input [1:0][3:0] stat ,
-	
-	output reg [1:0] acks,
-	
-	input ack_in,
-	input s_no // slave number
-);
-
-always @(posedge ack_in)
-	begin
-	if (s_no == slave[0] && stat[0] == W_ACK) acks[0] = ack_in; else acks[0] = 0;
-	if (s_no == slave[1] && stat[1] == W_ACK) acks[1] = ack_in; else acks[1] = 0;
-	end
-	
-endmodule
-*/
 
