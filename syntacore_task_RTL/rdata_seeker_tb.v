@@ -1,6 +1,6 @@
 `timescale 1ps / 1ps
 /*
-module rdata_seeker ( // only 1 master may be waiting for rdata
+module data_seeker ( // only 1 master may be waiting for rdata
 input clk, // data comes with a clock
 input [1:0] slave,
 input [1:0] [3:0] stat,
@@ -36,7 +36,7 @@ localparam W_ACK	= 2'd 2 ;
 localparam W_DATA	= 2'd 3 ;
 localparam NO_REQ	= 2'd 0 ;
 
-rdata_seeker uut ( 
+data_seeker uut ( 
 .clk(clk), 
 .slave1(sfor1), .slave0(sfor0),
 .stat1(stat1), .stat0(stat0),
