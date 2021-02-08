@@ -116,14 +116,14 @@ begin
 	
 	#5;
 
-	ack_s0 = 1; #3; ack_s0 = 0; // M0 waits for data /clk/ req0 to S0 is done
-	
+	ack_s0 = 1; /*#3; ack_s0 = 0; */// M0 waits for data /clk/ req0 to S0 is done
+	#4;
 	req0 = 1; // new req0 to S1
 	sfor0 = 1;
 	cmd0 = 1;
 	
 	#5;
-	ack_s0 = 1;  #3; ack_s0 = 0; // req1 to S0 is done
+	ack_s0 = 1;/*  #3; ack_s0 = 0; */// req1 to S0 is done
 	
 	#3;
 	req1 = 1; // new req1 to S0
@@ -131,9 +131,9 @@ begin
 	cmd1 = 1;
 	
 	#1;
-	ack_s0 = 1; #3; ack_s0 = 0;// req1 to S0 is done
+	ack_s0 = 1;/* #3; ack_s0 = 0;*/// req1 to S0 is done
 	#1;
-	ack_s1 = 1; #3; ack_s1 = 0;// req0 to S1 is done
+	ack_s1 = 1;/* #3; ack_s1 = 0;*/// req0 to S1 is done
 	
 	
 	

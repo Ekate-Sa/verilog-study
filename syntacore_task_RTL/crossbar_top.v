@@ -100,6 +100,7 @@ assign dr1 = data_read1_s0 | data_read1_s1 ;
 wire ack_s0_m0, ack_s0_m1, ack_s1_m0, ack_s1_m1;
 //S0
 rr_ack_arbiter ack_from0 (
+	.clk(clk),
 	.s_no(1'b0),
 	.ack_in(slave_0_ack),
 	.sfor0(sfor0), .sfor1(sfor1),
@@ -109,6 +110,7 @@ rr_ack_arbiter ack_from0 (
 );
 //S1
 rr_ack_arbiter ack_from1 (
+	.clk(clk),
 	.s_no(1'b1),
 	.ack_in(slave_1_ack),
 	.sfor0(sfor0), .sfor1(sfor1),

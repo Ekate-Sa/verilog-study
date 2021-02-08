@@ -1,5 +1,7 @@
+`timescale 1ns / 1ps
 
 module rr_ack_arbiter (
+	input clk,
 	input s_no,
 	input ack_in,
 	input sfor0, input sfor1,
@@ -15,39 +17,39 @@ localparam NO_REQ	= 2'd 0 ; // no request (all completed / not requested)
 
 reg last_mas;
 
-always @(posedge ack_in or negedge ack_in)
+always @(posedge clk)
 begin
 	case (last_mas)
-	0: if (sfor1 == s_no && req_stat1 == W_ACK) 
+	1: if (sfor1 == s_no && req_stat1 == W_ACK) 
 		begin 
-		ack0 = 0; ack1 = 1; 
+		ack0 = 0; ack1 = ack_in; 
 		last_mas = 1;
 		end
 		else if (sfor0 == s_no && req_stat0 == W_ACK) 
 			begin
-			ack0 = 1; ack1 = 0; 
+			ack0 = ack_in; ack1 = 0; 
 			last_mas = 0;
 			end 
 			else begin ack0 = 0; ack1 = 0; end
-	1: if (sfor0 == s_no && req_stat0 == W_ACK) 
+	0: if (sfor0 == s_no && req_stat0 == W_ACK) 
 		begin 
-		ack0 = 1; ack1 = 0; 
+		ack0 = ack_in; ack1 = 0; 
 		last_mas = 0;
 		end
 		else if (sfor1 == s_no && req_stat1 == W_ACK) 
 			begin
-			ack0 = 0; ack1 = 1; 
+			ack0 = 0; ack1 = ack_in; 
 			last_mas = 1;
 			end
 			else begin ack0 = 0; ack1 = 0; end
 	default if (sfor0 == s_no && req_stat0 == W_ACK) 
 			begin 
-			ack0 = 1; ack1 = 0; 
+			ack0 = ack_in; ack1 = 0; 
 			last_mas = 0;
 			end
 			else if (sfor1 == s_no && req_stat1 == W_ACK) 
 				begin
-				ack0 = 0; ack1 = 1; 
+				ack0 = 0; ack1 = ack_in; 
 				last_mas = 1;
 				end
 				else begin ack0 = 0; ack1 = 0; end
