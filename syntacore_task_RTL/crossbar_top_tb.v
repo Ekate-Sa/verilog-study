@@ -4,7 +4,7 @@
 	and only ack for slaves */
 
 module crossbar_top_tb();
-reg clk;
+reg clk; reg reset;
 
 reg req0;			reg req1;
 reg cmd0;			reg cmd1;
@@ -37,7 +37,7 @@ wire rsent0, rsent1;
 wire [1:0] stat0, stat1;
 */
 crossbar_top uut(
-	.clk(clk),
+	.clk(clk), .reset(reset),
 // masters
 	.master_0_req	(req0),
 	.master_0_cmd	(cmd0),
@@ -104,6 +104,9 @@ end
 
 initial
 begin
+	reset = 1; // RESET ADDED 
+	#2; reset = 0; #2; reset = 1;
+	
 	clk = 0;
 	ack_s0 = 0; ack_s1 = 0;
 	// Sends two reqs to S0 -----------
@@ -124,6 +127,7 @@ begin
 	
 	#5;
 	ack_s0 = 1;/*  #3; ack_s0 = 0; */// req1 to S0 is done
+	
 	
 	#3;
 	req1 = 1; // new req1 to S0

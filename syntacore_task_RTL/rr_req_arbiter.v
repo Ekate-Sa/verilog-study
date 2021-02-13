@@ -2,6 +2,8 @@
 
 module rr_req_arbiter(
 	input clk,
+	input reset,
+	
 	input s_no,
 	input [1:0] req_stat0, input [1:0] req_stat1,
 	
@@ -19,88 +21,93 @@ module rr_req_arbiter(
     );
 
 localparam WAIT 	= 2'd 1 ; // added to the queue1 
-localparam W_ACK	= 2'd 2 ; // request sent, waits for ack (added to the queue2) 
-localparam W_DATA	= 2'd 3 ; // cmd = 0 (read), ack came, waits for data
-localparam NO_REQ	= 2'd 0 ; // no request (all completed / not requested)
 
 reg last_mas;
 	
 /* perm0, perm1 also are used as signals to change req_stat WAIT -> W_ACK */
-always @(posedge clk)
+always @(posedge clk, negedge reset) // ASYNC RESET, active level LOW
+if (reset)
 begin
 	case (last_mas)
 	0: if (sfor1 == s_no && req_stat1 == WAIT) 
 		begin 
-		perm0 = 0; perm1 = 1; 
-		last_mas = 1;
+		perm0 <= 0; perm1 <= 1; 
+		last_mas <= 1;
 		
 		// when M1        
-		addr_to = addr1;  
-		cmd_to = cmd1;    
-		wdata_to = wdata1;
+		addr_to <= addr1;  
+		cmd_to <= cmd1;    
+		wdata_to <= wdata1;
 		
 		end
 		else if (sfor0 == s_no && req_stat0 == WAIT) 
 			begin
-			perm0 = 1; perm1 = 0; 
-			last_mas = 0;
+			perm0 <= 1; perm1 <= 0; 
+			last_mas <= 0;
 			
 			// when M0
-			addr_to = addr0;
-			cmd_to = cmd0;
-			wdata_to = wdata0;
+			addr_to <= addr0;
+			cmd_to <= cmd0;
+			wdata_to <= wdata0;
 			
 			end 
-			else begin perm0 = 0; perm1 = 0; end
+			else begin perm0 <= 0; perm1 <= 0; end
 	1: if (sfor0 == s_no && req_stat0 == WAIT) 
 		begin 
-		perm0 = 1; perm1 = 0; 
-		last_mas = 0;
+		perm0 <= 1; perm1 <= 0; 
+		last_mas <= 0;
 		
 		// when M0
-		addr_to = addr0;
-		cmd_to = cmd0;
-		wdata_to = wdata0;
+		addr_to <= addr0;
+		cmd_to <= cmd0;
+		wdata_to <= wdata0;
 		
 		end
 		else if (sfor1 == s_no && req_stat1 == WAIT) 
 			begin
-			perm0 = 0; perm1 = 1; 
-			last_mas = 1;
+			perm0 <= 0; perm1 <= 1; 
+			last_mas <= 1;
 			
 			// when M1        
-			addr_to = addr1;  
-			cmd_to = cmd1;    
-			wdata_to = wdata1;
+			addr_to <= addr1;  
+			cmd_to <= cmd1;    
+			wdata_to <= wdata1;
 			
 			end
-			else begin perm0 = 0; perm1 = 0; end
+			else begin perm0 <= 0; perm1 <= 0; end
 	default if (sfor0 == s_no && req_stat0 == WAIT) 
 			begin 
-			perm0 = 1; perm1 = 0; 
-			last_mas = 0;
+			perm0 <= 1; perm1 <= 0; 
+			last_mas <= 0;
 			
 			// when M0
-			addr_to = addr0;
-			cmd_to = cmd0;
-			wdata_to = wdata0;
+			addr_to <= addr0;
+			cmd_to <= cmd0;
+			wdata_to <= wdata0;
 			
 			end
 			else if (sfor1 == s_no && req_stat1 == WAIT) 
 				begin
-				perm0 = 0; perm1 = 1; 
-				last_mas = 1;
+				perm0 <= 0; perm1 <= 1; 
+				last_mas <= 1;
 				
 				// when M1
-				addr_to = addr1;
-				cmd_to = cmd1;
-				wdata_to = wdata1;
+				addr_to <= addr1;
+				cmd_to <= cmd1;
+				wdata_to <= wdata1;
 				
 				end
-				else begin perm0 = 0; perm1 = 0; end
+				else begin perm0 <= 0; perm1 <= 0; end
 	endcase
 	
-	
+end
+else /* reset */
+begin
+	last_mas <= 1; // after reset last_mas is the (N-1)'th Master
+	perm0 <= 0; perm1 <= 0;
+	addr_to <= 0;
+	cmd_to <= 0;
+	wdata_to <= 0;
 end
 
 endmodule

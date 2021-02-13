@@ -1,7 +1,9 @@
-`timescale 1ps / 1ps
+`timescale 1ns / 1ps
 
 module m_block  // number of M/S
 (
+	input clk,
+	input reset,
 	// to master
 	input req, // connected to req
 	input slave_in, // connected to addr 1st bit
@@ -24,37 +26,35 @@ localparam NO_REQ	= 2'd 0 ; // no request (all completed / not requested)
 
 reg cmd;
 
-
-always @(posedge req) // new request
+always @(posedge clk, negedge reset) // ASYNC RESET, active level LOW
+if (reset)
 begin
-	req_stat = WAIT ; // status wait
-	slave_out = slave_in;// note slave, cmd
-	cmd = c ;	
-end
-
-always @(negedge req) 
-begin
-	req_stat = NO_REQ ; 
-end
-
-always @(posedge ack_in)
-begin
-	case (cmd)
-	1'b0 : req_stat = W_DATA ; // wait for data
-	1'b1 : req_stat = NO_REQ ; // data written, request done
-	default: req_stat = NO_REQ ;
+	case (req_stat)
+	NO_REQ : 	if (req)
+				begin
+				req_stat <= WAIT;
+				slave_out <= 0; // mb X?
+				cmd <= 0; // mb X?
+				end 
+	WAIT :		if (req_sent) req_stat <= W_ACK ;
+	
+	W_ACK :		if (ack_in)
+				case (cmd)
+				1'b0 : req_stat <= W_DATA ; // wait for data
+				1'b1 : req_stat <= NO_REQ ; // data written, request done
+				default: req_stat <= NO_REQ ;
+				endcase
+	
+	W_DATA :	if (data_read) req_stat <= NO_REQ;
+	//default : nothing
 	endcase
-	//ack_to_m = 1 ;
-end
-
-always @(posedge req_sent)
+	
+end 
+else /* reset */
 begin
-	req_stat = W_ACK;
-end
-
-always @(posedge data_read)
-begin
-	if (req_stat == W_DATA) req_stat = NO_REQ ;
+	req_stat <= NO_REQ;
+	slave_out <= 0; // mb X?
+	cmd <= 0; // mb X?
 end
 
 endmodule
